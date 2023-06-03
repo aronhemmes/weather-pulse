@@ -1,12 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using WeatherPulse.Models;
+using WeatherPulse.Services;
 
 namespace WeatherPulse.Controllers
 {
-    public class UserController : Controller
+    [Route("")]
+    [ApiController]
+    public class UserController : ControllerBase
     {
-        public IActionResult Index()
+        private readonly IUserService userService;
+
+        public UserController(IUserService userService)
         {
-            return View();
+            this.userService = userService;
+        }
+
+        [HttpPost("register")]
+        public IActionResult Register(RegisterUserRequest registerRequest)
+        {
+            var result = userService.Register(registerRequest).Result;
+
+            if (result != null)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
     }
 }
