@@ -11,7 +11,7 @@ builder.Services.AddDbContext<UserDBContext>(options => options.UseSqlServer(bui
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IWeatherForecast, WeatherForecast>();
 builder.Services.AddScoped<IMessager, Messager>();
-builder.Services.AddHostedService<DailySchedulerService>();
+builder.Services.AddScoped<DailySchedulerService>();
 
 builder.Services.AddControllers();
 
@@ -19,6 +19,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
+var scopeFactory = app.Services.GetRequiredService<IServiceScopeFactory>();
+using (var scope = scopeFactory.CreateScope())
+{
+    var scheduler = scope.ServiceProvider.GetRequiredService<DailySchedulerService>();
+    await scheduler.StartAsync(CancellationToken.None);
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
