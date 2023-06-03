@@ -10,6 +10,8 @@ var con = builder.Configuration.GetConnectionString("Database");
 builder.Services.AddDbContext<UserDBContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("UserDB")));
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWeatherForecast, WeatherForecast>();
+builder.Services.AddScoped<IMessager, Messager>();
 
 builder.Services.AddControllers();
 

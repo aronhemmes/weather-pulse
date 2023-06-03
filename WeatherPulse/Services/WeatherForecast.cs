@@ -1,39 +1,35 @@
-﻿using System.Text.Json;
-using WeatherPulse.Models;
+﻿using System.Globalization;
+using System.Text.Json;
 
 namespace WeatherPulse.Services
 {
     public class WeatherForecast : IWeatherForecast
     {
-        public async Task<string?> GetWeatherForecast(string location, float latitude, float longitude, string day)
+        public async Task<string?> GetWeatherForecast(string location, decimal latitude, decimal longitude, string day)
         {
-            string url = $"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true&hourly=temperature_2m,precipitation&timezone=auto&start_date={day}&end_date={day}";
+            string lat = latitude.ToString(CultureInfo.InvariantCulture);
+            string lon = longitude.ToString(CultureInfo.InvariantCulture);
+            string url = $"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&hourly=temperature_2m,precipitation&timezone=auto&start_date={day}&end_date={day}";
 
             using HttpClient client = new();
 
-            try
-            {
-                HttpResponseMessage response = await client.GetAsync(url);
-                response.EnsureSuccessStatusCode();
+            HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
 
-                string responseBody = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(responseBody);
+            string responseBody = await response.Content.ReadAsStringAsync();
 
-                var json = JsonDocument.Parse(responseBody);
-                decimal[] temperature = json.RootElement.GetProperty("hourly").GetProperty("temperature_2m").EnumerateArray().Select(x => x.GetDecimal()).ToArray();
-                decimal[] precipitation = json.RootElement.GetProperty("hourly").GetProperty("precipitation").EnumerateArray().Select(x => x.GetDecimal()).ToArray();
+            JsonDocument document = JsonDocument.Parse(responseBody);
+            JsonElement hourly = document.RootElement.GetProperty("hourly");
+            JsonElement precipitation = hourly.GetProperty("precipitation");
+            JsonElement temperature_2m = hourly.GetProperty("temperature_2m");
+            List<decimal> precipitationList = JsonSerializer.Deserialize<List<decimal>>(precipitation.GetRawText());
+            List<decimal> temperatureList = JsonSerializer.Deserialize<List<decimal>>(temperature_2m.GetRawText());
 
 
-                return ForecastMessage(location, temperature.Min(), temperature.Max(), precipitation.Max());
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-                return null;
-            }
+            return ForecastMessage(location, temperatureList.Min(), temperatureList.Max(), precipitationList.Max());
         }
 
-        private string ForecastMessage(string location, decimal tempLow, decimal tempHigh, decimal precipitation)
+        private static string ForecastMessage(string location, decimal tempLow, decimal tempHigh, decimal precipitation)
         {
             string message = $"Good morning!\n\nToday's weather forecast at {location}:\n- Temperature: {tempLow}°C - {tempHigh}°C\n- Precipitation: {precipitation} mm";
 
