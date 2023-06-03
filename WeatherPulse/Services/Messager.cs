@@ -5,14 +5,23 @@ namespace WeatherPulse.Services
 {
     public class Messager : IMessager
     {
-        public async Task<TextClientResult> SendMessage(string message, string phone)
+        private readonly IConfiguration configuration;
+
+        public Messager(IConfiguration configuration)
         {
-            //var client = new TextClient(new Guid(ConfigurationManager.AppSettings["ApiKey"]));
+            this.configuration = configuration;
+        }
 
-            //var result = await client.SendMessageAsync(message, "Weather Pulse", new List<string> { phone }, "Your_Reference").ConfigureAwait(false);
+        public async Task<TextClientResult?> SendMessage(string message, string phone)
+        {
+            string? key = configuration.GetSection("ApiKey").Value;
+            if (key == null) return null;
 
-            throw new NotImplementedException();
-            //return result;
+            var client = new TextClient(new Guid(key));
+
+            var result = await client.SendMessageAsync(message, "Weather Pulse", new List<string> { phone }, "Your_Reference").ConfigureAwait(false);
+
+            return result;
         }
     }
 }
