@@ -1,4 +1,5 @@
-﻿using WeatherPulse.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WeatherPulse.Data;
 using WeatherPulse.Models;
 
 namespace WeatherPulse.Services
@@ -34,6 +35,13 @@ namespace WeatherPulse.Services
                 return null;
             }
 
+        }
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            List<User> users = await userDBContext.User.ToListAsync();
+
+            return users;
         }
     }
 }
