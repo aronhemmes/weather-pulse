@@ -9,7 +9,11 @@ namespace WeatherPulse.Models
         [Required, Phone]
         public string Phone { get; set; }
         [Required]
-        [RegularExpression(@"^[a-zA-Z\\s]+(?:\\/[a-zA-Z\\s]+)?$", ErrorMessage = "Location is invalid")]
+        //[RegularExpression(@"^[a-zA-Z\\s]+(?:\\/[a-zA-Z\\s]+)?$", ErrorMessage = "Location is invalid")]
         public string Location { get; set; }
+        [Required]
+        public decimal Latitude { get; set; }
+        [Required]
+        public decimal Longitude { get; set; }
     }
 }

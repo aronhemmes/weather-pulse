@@ -18,7 +18,10 @@ namespace WeatherPulse.Services
             {
                 Phone = registerRequest.Phone,
                 Location = registerRequest.Location,
+                Latitude = registerRequest.Latitude,
+                Longitude = registerRequest.Longitude
             };
+
             try
             {
                 var newuser = userDBContext.User.Add(user);
