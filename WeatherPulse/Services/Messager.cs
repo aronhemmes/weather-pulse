@@ -18,8 +18,8 @@ namespace WeatherPulse.Services
             if (key == null) return null;
 
             var client = new TextClient(new Guid(key));
-
-            var result = await client.SendMessageAsync(message, "Weather Pulse", new List<string> { phone }, "Your_Reference").ConfigureAwait(false);
+             
+            var result = await client.SendMessageAsync(message, "CM.com", new List<string> { phone }, "").ConfigureAwait(false);
 
             return result;
         }
